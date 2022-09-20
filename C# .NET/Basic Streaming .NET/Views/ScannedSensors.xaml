@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Basic_Streaming.NET.Views.ScannedSensors"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="400">
+    <Border BorderBrush="#706C61" Height="500" Width="400" BorderThickness="1">
+        <Grid Background="#706C61">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" 
+                       Text="Paired Sensors" 
+                       Foreground="White" 
+                       TextAlignment="Center" 
+                       VerticalAlignment="Center" 
+                       FontWeight="DemiBold" 
+                       FontSize="20"/>
+
+
+            <StackPanel Name="MainPanel" Background="White" Grid.Row="1" Orientation="Vertical">
+                <ListBox Name="ScannedSensorsList" Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Height="400" Margin="1" Visibility="Collapsed"/>
+            </StackPanel>
+
+            <Button Grid.Row="2" Name="btn_ArmPipeline" Content="Arm Pipeline" Click="clk_ArmPipeline" FontSize="16" FontWeight="DemiBold" Background="#FF4E33" Foreground="White" />
+
+        </Grid>
+
+        
+    </Border>
+</UserControl>

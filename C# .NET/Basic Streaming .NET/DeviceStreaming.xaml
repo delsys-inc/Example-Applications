@@ -1,0 +1,127 @@
+﻿<UserControl x:Class="Basic_Streaming.NET.DeviceStreaming"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Basic_Streaming.NET">
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border BorderBrush="#032E63"
+                Height="500"
+                Width="400"
+                BorderThickness="1"
+                Margin="20">
+            <Grid Grid.Column="0"
+                  Background="#706C61">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Button Grid.Row="0"
+                        Grid.ColumnSpan="2"
+                        Click="clk_LoadDevice"
+                        Name="btn_LoadDevice"
+                        Content="Load Trigno Device"
+                        Margin="1"
+                        Background="#FF4E33"
+                        Foreground="White"
+                        FontWeight="DemiBold" />
+                <Button IsEnabled="False"
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Name="btn_PairSensors"
+                        Click="clk_Pair"
+                        Content="Pair Additional Sensors"
+                        Margin="1"
+                        Background="#FF4E33"
+                        Foreground="White"
+                        FontWeight="DemiBold" />
+                <Button IsEnabled="False"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Click="clk_Scan"
+                        Name="btn_ScanSensors"
+                        Content="Scan for Paired Sensors"
+                        Margin="1"
+                        Background="#FF4E33"
+                        Foreground="White"
+                        FontWeight="DemiBold" />
+                <Button IsEnabled="False"
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Name="btn_Start"
+                        Content="Start Stream"
+                        Click="clk_Start"
+                        Margin="1,2,1,99"
+                        Background="#FF4E33"
+                        Foreground="White"
+                        FontWeight="DemiBold"
+                        Grid.RowSpan="2" />
+
+                <Button IsEnabled="False"
+                        Grid.Row="2"
+                        Name="btn_Stop"
+                        Content="Stop Stream"
+                        Click="clk_Stop"
+                        Margin="1,2,1,99"
+                        Background="#FF4E33"
+                        Foreground="White"
+                        FontWeight="DemiBold"
+                        Grid.RowSpan="2"
+                        Grid.Column="1" />
+                <Button IsEnabled="False"
+                        Grid.Row="3"
+                        Grid.ColumnSpan="2"
+                        Name="btn_Export"
+                        Content="Export Data to CSV"
+                        Click="clk_Export"
+                        Margin="1,3,1,98"
+                        Background="#FF4E33"
+                        Foreground="White"
+                        FontWeight="DemiBold"
+                        Grid.RowSpan="2" />
+
+                <Button IsEnabled="False"
+                        Grid.Row="4"
+                        Name="btn_Reset"
+                        Content="Reset Pipeline"
+                        Click="clk_Reset"
+                        Margin="1,4,1,0"
+                        Background="#FF4E33"
+                        Foreground="White"
+                        FontWeight="DemiBold"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"/>
+            </Grid>
+        </Border>
+
+        <Grid Name="MainPanel"
+              Grid.Column="1">
+
+        </Grid>
+
+        <Grid Name="SecondaryPanel"
+              Grid.Column="2">
+
+        </Grid>
+
+    </Grid>
+</UserControl>
+

@@ -1,0 +1,130 @@
+﻿<Window x:Class="Basic_Streaming.NET.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Basic_Streaming.NET"
+        mc:Ignorable="d"
+        Title="Basic Streaming"
+        Height="720"
+        Width="1350"
+        MinWidth="1350"
+        WindowState="Maximized">
+
+    <DockPanel>
+
+        <Rectangle DockPanel.Dock="Bottom"
+                   Height="50"
+                   Fill="#706C61" />
+
+        <Grid DockPanel.Dock="Top"
+              Height="50"
+              Background="#706C61">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="Delsys API - .NET Basic Streaming"
+                       VerticalAlignment="Center"
+                       Margin="10"
+                       Foreground="White"
+                       FontWeight="DemiBold"
+                       FontSize="18" />
+            <Button Click="clk_Exit"
+                    Grid.Column="1"
+                    Content="Exit"
+                    HorizontalAlignment="Right"
+                    Margin="10"
+                    Height="25"
+                    Width="50"
+                    Background="#FF4E33"
+                    Foreground="White" />
+            <Button Name="btn_backToMainPageButton"
+                    Click="clk_BackButton"
+                    IsEnabled="true"
+                    Content="Back To Main Page"
+                    Background="#FF4E33"
+                    Foreground="White"
+                    Margin="476,10,86,8"
+                    Grid.Column="1" />
+        </Grid>
+
+        <Border Background="#F8F4E3"
+                BorderBrush="#706C61"
+                BorderThickness="1"
+                ClipToBounds="True">
+
+            <Border Background="Transparent"
+                    BorderBrush="Black"
+                    BorderThickness="1"
+                    Margin="-2">
+
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="3"
+                                      BlurRadius="15" />
+                </Border.Effect>
+
+                <Grid Name="MainPanel">
+
+                    <Border Name="MainWindowBorder"
+                            BorderBrush="#706C61"
+                            BorderThickness="2"
+                            Height="150"
+                            Width="500">
+
+                        <Grid Name="MainWindowGrid"
+                              Background="White">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="60" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Name="MainWindowText"
+                                       Grid.Row="0"
+                                       Grid.ColumnSpan="2"
+                                       Text="Please choose a streaming type:"
+                                       FontSize="18"
+                                       FontWeight="DemiBold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Margin="10" />
+
+                            <Button Name="btn_DeviceStreaming"
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    HorizontalAlignment="Center"
+                                    Grid.Column="0"
+                                    Content="Device Streaming"
+                                    Click="clk_DeviceStreaming"
+                                    FontSize="12"
+                                    Width="175"
+                                    Height="40"
+                                    Margin="10"
+                                    Background="#FF4E33"
+                                    Foreground="White"
+                                    BorderThickness="0"
+                                    FontWeight="DemiBold" />
+
+                        </Grid>
+
+                    </Border>
+
+
+                </Grid>
+
+            </Border>
+
+
+        </Border>
+
+    </DockPanel>
+</Window>

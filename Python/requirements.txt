@@ -1,0 +1,5 @@
+Pyside2
+Vispy
+Scipy
+pythonnet
+numpy

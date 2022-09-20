@@ -1,0 +1,89 @@
+﻿<UserControl x:Class="Basic_Streaming.NET.Views.PairSensor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Basic_Streaming.NET.Views"
+             mc:Ignorable="d"
+             d:DesignWidth="400"
+             Height="950">
+    <Border BorderBrush="#706C61"
+            Height="200"
+            Width="400"
+            BorderThickness="1">
+        <Grid Background="#706C61">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="96*" />
+                <ColumnDefinition Width="26*" />
+                <ColumnDefinition Width="77*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition />
+                <RowDefinition Height="50" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Pair Sensor"
+                       Foreground="White"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontWeight="DemiBold"
+                       FontSize="20"
+                       Grid.ColumnSpan="3" />
+
+            <StackPanel Name="MainPanel"
+                        Background="White"
+                        Grid.Row="1"
+                        Orientation="Vertical"
+                        Grid.ColumnSpan="3">
+                <TextBlock Margin="0,10,0,0"
+                           HorizontalAlignment="Center"
+                           Name="TextBoxForSensorNumberDropDown"
+                           FontSize="20"
+                           Visibility="Visible"
+                           Grid.ColumnSpan="3"
+                           FontFamily="Arial"
+                           FontWeight="DemiBold">Enter a Sensor Number</TextBlock>
+                <TextBox Margin="0,5,0,0"
+                         Width="50"
+                         Height="35"
+                         Name="textbox_ForSensorNumber"
+                         FontSize="20"
+                         HorizontalContentAlignment="Center"
+                         VerticalContentAlignment="Center"
+                         FontFamily="Arial"></TextBox>
+            </StackPanel>
+            
+            
+            <TextBlock Margin="22,70,22,10"
+                       Grid.Row="1"
+                       Foreground="Red"
+                       Visibility="Visible"
+                       Name="UserInputLettersErrorMessage"
+                       TextAlignment="Center"
+                       Grid.ColumnSpan="3"
+                       FontFamily="Arial"
+                       FontWeight="DemiBold"></TextBlock>
+            <Button Grid.Row="2"
+                    Click="clk_AddSensor"
+                    Name="btn_Add"
+                    Content="Add Sensor"
+                    FontSize="16"
+                    FontWeight="DemiBold"
+                    Background="#FF4E33"
+                    Foreground="White"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    
+                    />
+            <Button Click="clk_Cancel"
+                    Grid.Row="2"
+                    Grid.Column="3"
+                    Background="Transparent"
+                    Foreground="White"
+                    FontSize="14"
+                    Content="Finish and Scan" />
+        </Grid>
+    </Border>
+</UserControl>

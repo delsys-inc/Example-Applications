@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="Basic_Streaming.NET.Views.LoadingIcon"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Basic_Streaming.NET.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    
+    <Grid Margin="20" VerticalAlignment="Stretch" Background="White">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <fa:ImageAwesome Name="Icon"  Grid.Row="0" Foreground="#706C61" Icon="spinner" Spin="True" SpinDuration="2" Height="48" Width="48" />
+
+        <TextBlock Grid.Row="1" Name="LoadMsg" Foreground="#706C61"  TextAlignment="Center" VerticalAlignment="Center" FontSize="14"/>
+
+    </Grid>
+    
+</UserControl>
