@@ -24,6 +24,9 @@ namespace Basic_Streaming.NET
     /// </summary>
     public partial class DeviceStreaming : UserControl
     {
+       
+	// Add your API key & license here 
+
         private string key = "";
         private string license = "";
 
@@ -65,10 +68,6 @@ namespace Basic_Streaming.NET
 
         private void InitializeDataSource()
         {
-            // Add your API key & license here 
-
-            
-
 
             // The API uses a factory method to create the data source of your application.
             // This creates the factory method, which will then give the data source for your platform.
