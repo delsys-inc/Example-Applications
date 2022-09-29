@@ -8,7 +8,7 @@ See [AeroPy Documentation](#AeroPy-Documentation)
 
 ## Getting Started
 1. Install Python here: [Python 3.8.1](https://www.python.org/downloads/release/python-381/).
-2. Navigate to the `/Delsys-Python-Demo` base directory
+2. Navigate to the `Example-Applications/Python` base directory
 3. Install dependencies using `python -m pip install -r requirements.txt` 
 -NOTE: PythonNet library is only supported up to python 3.8. 
 4. Open `/AeroPy/TrignoBase.py` and copy/paste the key/license strings provided by Delsys Inc. during system purchase. Contact [support](https://delsys.com/support/) if you have any issues.
