@@ -11,11 +11,15 @@ class DataKernel():
         self.TrigBase = trigno_base
         self.packetCount = 0
         self.sampleCount = 0
+        self.allcollectiondata = [[]]
+
 
     def processData(self, data_queue):
         """Processes the data from the Trigno Base and places it in the data_queue argument"""
         outArr = self.GetData()
         if outArr is not None:
+            for i in range(len(outArr)):
+                self.allcollectiondata[i].extend(outArr[i][0].tolist())
             try:
                 for i in range(len(outArr[0])):
                     if np.asarray(outArr[0]).ndim == 1:
