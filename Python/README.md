@@ -102,6 +102,12 @@ public void PairSensor()
 This sets the base into pairing mode, allowing for a user to pair a new sensor to the base.
 Pipeline must be in the Off or Connected State to run this command 
 
+&nbsp;<br>
+```C#
+public bool CheckPairStatus()
+```
+After running the PairSensor() command, use this boolean to check if the sensor pair action (i.e. tap to magnet) was completed. Pairing is true while waiting to pair the sensor, and false once the pair has been initiated on a sensor. 
+
 &nbsp;<br>  
 ```C#
 public bool SelectAllSensors()
@@ -128,6 +134,12 @@ public List<string> GetAllSampleModes()
 Get all of the sample modes that the sensors are currently set to.
 
 &nbsp;<br>  
+```C#
+public string GetCurrentSensorMode(int sensorNo)
+```
+Get the current sensor mode string of the sensor object at index sensorNo.
+
+&nbsp;<br>  
 
 ```C#
 public void SetSampleMode(int componentNum, string sampleMode)
@@ -151,9 +163,9 @@ Return the list of sensor modes available to the sensor at index sensorSelected
 ### Sensor Configuration (RF)
 
 ```C#
-public void Configure()
+public void Configure(bool starttrigger = false, bool stoptrigger = false)
 ```
-Default Configure method - Will configure pipeline for raw data output on all scanned sensors. Pipeline must be in the Off or Connected State. Pipeline will transition to Armed
+Default Configure method - Will configure pipeline for raw data output on all scanned sensors. To enable triggering (start/stop) pass two 'True' booleans to this method. If no arguments are provided, the system will be set up without start/stop triggering enabled. Pipeline will transition to Armed
 
 &nbsp;<br>  
 
@@ -190,6 +202,20 @@ public void ResetPipeline()
 Resets (disarms) Pipeline - Pipeline must be in the Armed state. Pipeline will transition to Connected (Allows for users to call Scan/Pair after a collections is stopped)
 
 &nbsp;<br>  
+
+```C#
+public bool IsWaitingForStartTrigger()
+```
+If start trigger is enabled (see Configure method above), once the Start() command is initiated this method will return true until the start trigger is pressed, then this method will return false and data streaming will begin.
+
+&nbsp;<br> 
+
+```C#
+public bool IsWaitingForStopTrigger()
+```
+If stop trigger is enabled, once the data collection has started this method will return true until the stop trigger is pressed, then this method will return false and the data streaming will end.
+
+&nbsp;<br> 
 ### Helper Functions (RF Connection)
 
 ```C#
