@@ -4,9 +4,11 @@ This is the GUI that lets you connect to a base, scan via rf for sensors, and st
 """
 
 import sys
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+import threading
+import time
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 from DataCollector.CollectDataController import *
 import tkinter as tk
 from tkinter import filedialog
@@ -14,9 +16,11 @@ from tkinter import filedialog
 from DataCollector.CollectionMetricsManagement import CollectionMetricsManagement
 from Plotter import GenericPlot as gp
 
+
 class CollectDataWindow(QWidget):
     plot_enabled = False
-    def __init__(self,controller):
+
+    def __init__(self, controller):
         QWidget.__init__(self)
         self.pipelinetext = "Off"
         self.controller = controller
@@ -34,9 +38,8 @@ class CollectDataWindow(QWidget):
         layout.addWidget(self.splitter)
         self.setLayout(layout)
         self.setWindowTitle("Collect Data GUI")
-
-        #---- Connect the controller to the GUI
-
+        self.pairing = False
+        # ---- Connect the controller to the GUI
 
     def AddPlotPanel(self):
         self.plotPanel = self.Plotter()
@@ -44,42 +47,32 @@ class CollectDataWindow(QWidget):
 
     def SetCallbackConnector(self):
         if self.plot_enabled:
-            self.CallbackConnector = PlottingManagement(self.MetricsConnector, self.plotCanvas)
+            self.CallbackConnector = PlottingManagement(self, self.MetricsConnector, self.plotCanvas)
         else:
-            self.CallbackConnector = PlottingManagement(self.MetricsConnector)
+            self.CallbackConnector = PlottingManagement(self, self.MetricsConnector)
 
-    #-----------------------------------------------------------------------
-    #---- GUI Components
+    # -----------------------------------------------------------------------
+    # ---- GUI Components
     def ButtonPanel(self):
         buttonPanel = QWidget()
         buttonLayout = QVBoxLayout()
 
-
-        #---- Connect Button
-        self.connect_button = QPushButton('Connect', self)
-        self.connect_button.setToolTip('Connect Base')
-        self.connect_button.setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Expanding)
-        self.connect_button.objectName = 'Connect'
-        self.connect_button.clicked.connect(self.connect_callback)
-        self.connect_button.setStyleSheet('QPushButton {color: white;}')
-        buttonLayout.addWidget(self.connect_button)
-
         findSensor_layout = QHBoxLayout()
 
-        #---- Pair Button
+        # ---- Pair Button
         self.pair_button = QPushButton('Pair', self)
         self.pair_button.setToolTip('Pair Sensors')
-        self.pair_button.setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Expanding)
+        self.pair_button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.pair_button.objectName = 'Pair'
         self.pair_button.clicked.connect(self.pair_callback)
         self.pair_button.setStyleSheet('QPushButton {color: grey;}')
         self.pair_button.setEnabled(False)
         findSensor_layout.addWidget(self.pair_button)
 
-        #---- Scan Button
+        # ---- Scan Button
         self.scan_button = QPushButton('Scan', self)
         self.scan_button.setToolTip('Scan for Sensors')
-        self.scan_button.setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Expanding)
+        self.scan_button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.scan_button.objectName = 'Scan'
         self.scan_button.clicked.connect(self.scan_callback)
         self.scan_button.setStyleSheet('QPushButton {color: grey;}')
@@ -105,7 +98,7 @@ class CollectDataWindow(QWidget):
 
         buttonLayout.addLayout(triggerLayout)
 
-        #---- Start Button
+        # ---- Start Button
         self.start_button = QPushButton('Start', self)
         self.start_button.setToolTip('Start Sensor Stream')
         self.start_button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -115,7 +108,7 @@ class CollectDataWindow(QWidget):
         self.start_button.setEnabled(False)
         buttonLayout.addWidget(self.start_button)
 
-        #---- Stop Button
+        # ---- Stop Button
         self.stop_button = QPushButton('Stop', self)
         self.stop_button.setToolTip('Stop Sensor Stream')
         self.stop_button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -125,7 +118,7 @@ class CollectDataWindow(QWidget):
         self.stop_button.setEnabled(False)
         buttonLayout.addWidget(self.stop_button)
 
-        #---- Drop-down menu of sensor modes
+        # ---- Drop-down menu of sensor modes
         self.SensorModeList = QComboBox(self)
         self.SensorModeList.setToolTip('Sensor Modes')
         self.SensorModeList.objectName = 'PlaceHolder'
@@ -133,7 +126,7 @@ class CollectDataWindow(QWidget):
         self.SensorModeList.currentIndexChanged.connect(self.sensorModeList_callback)
         buttonLayout.addWidget(self.SensorModeList)
 
-        #---- List of detected sensors
+        # ---- List of detected sensors
         self.SensorListBox = QListWidget(self)
         self.SensorListBox.setToolTip('Sensor List')
         self.SensorListBox.objectName = 'PlaceHolder'
@@ -148,12 +141,14 @@ class CollectDataWindow(QWidget):
     def Plotter(self):
         widget = QWidget()
         widget.setLayout(QVBoxLayout())
-        plot_mode = 'windowed'                 # Select between 'scrolling' and 'windowed'
+
+        plot_mode = 'windowed'  # Select between 'scrolling' and 'windowed'
         pc = gp.GenericPlot(plot_mode)
         pc.native.objectName = 'vispyCanvas'
         pc.native.parent = self
         widget.layout().addWidget(pc.native)
         self.plotCanvas = pc
+
         return widget
 
     def CollectionLabelPanel(self):
@@ -180,24 +175,19 @@ class CollectDataWindow(QWidget):
         framescollectedlabel.setStyleSheet("color:white")
         collectionlabelsLayout.addWidget(framescollectedlabel)
 
-
-
-        collectionLabelPanel.setFixedWidth(150)
+        collectionLabelPanel.setFixedWidth(200)
         collectionLabelPanel.setLayout(collectionlabelsLayout)
 
         return collectionLabelPanel
 
-
-    #-----------------------------------------------------------------------
-    #---- Callback Functions
+    # -----------------------------------------------------------------------
+    # ---- Callback Functions
     def getpipelinestate(self):
-        self.pipelinetext = self.CallbackConnector.PipelineState_Callback()
+        self.pipelinetext = self.CallbackConnector.base.PipelineState_Callback()
         self.MetricsConnector.pipelinestatelabel.setText(self.pipelinetext)
 
     def connect_callback(self):
-        self.CallbackConnector.Connect_Callback()
-        self.connect_button.setEnabled(False)
-        self.connect_button.setStyleSheet("color: grey")
+        self.CallbackConnector.base.Connect_Callback()
 
         self.pair_button.setEnabled(True)
         self.pair_button.setStyleSheet('QPushButton {color: white;}')
@@ -211,17 +201,106 @@ class CollectDataWindow(QWidget):
         self.MetricsConnector.pipelinestatelabel.setText(self.pipelinetext + " (Base Connected)")
 
     def pair_callback(self):
-        self.CallbackConnector.Pair_Callback()
-        self.scan_callback()
+        """Pair button callback"""
+        self.Pair_Window()
         self.getpipelinestate()
 
+    def Pair_Window(self):
+        """Open pair sensor window to set pair number and begin pairing process"""
+        pair_number, pressed = QInputDialog.getInt(QWidget(), "Input Pair Number", "Pair Number:",
+                                                   1, 0, 100, 1)
+        if pressed:
+            self.pairing = True
+            self.pair_canceled = False
+            self.CallbackConnector.base.pair_number = pair_number
+            self.PairThreadManager()
+
+    def PairThreadManager(self):
+        """Start t1 thread to begin pairing operation in DelsysAPI
+           Start t2 thread to await result of CheckPairStatus() to return False
+           Once threads begin, display awaiting sensor pair request window/countdown"""
+
+        self.t1 = threading.Thread(target=self.CallbackConnector.base.Pair_Callback)
+        self.t1.start()
+
+        self.t2 = threading.Thread(target=self.awaitPairThread)
+        self.t2.start()
+
+        self.BeginPairingUISequence()
+
+
+    def BeginPairingUISequence(self):
+        """The awaiting sensor window will stay open until either:
+           A) The pairing countdown timer completes (The end of the countdown will send a CancelPair request to the DelsysAPI)
+           or...
+           B) A sensor has been paired to the base (via self.pairing flag set by DelsysAPI CheckPairStatus() bool)
+
+           If a sensor is paired, ask the user if they want to pair another sensor (No = start a scan for all previously paired sensors)
+        """
+
+        pair_success = False
+        self.pair_countdown_seconds = 15
+
+        awaitingPairWindow = QDialog()
+        awaitingPairWindow.setWindowTitle(
+            "Sensor (" + str(self.CallbackConnector.base.pair_number) + ") Awaiting sensor pair request. . . Cancel in: " + str(self.pair_countdown_seconds))
+        awaitingPairWindow.setFixedWidth(500)
+        awaitingPairWindow.setFixedHeight(80)
+        awaitingPairWindow.show()
+
+        while self.pair_countdown_seconds > 0:
+            if self.pairing:
+                time.sleep(1)
+                self.pair_countdown_seconds -= 1
+                self.UpdateTimerUI(awaitingPairWindow)
+            else:
+                pair_success = True
+                break
+
+        awaitingPairWindow.close()
+        if not pair_success:
+            self.CallbackConnector.base.TrigBase.CancelPair()
+        else:
+            self.ShowPairAnotherSensorDialog()
+
+    def awaitPairThread(self):
+        """ Wait for a sensor to be paired
+        Once PairSensor() command is sent to the DelsysAPI, CheckPairStatus() will return True until a sensor has been paired to the base"""
+        time.sleep(1)
+        while self.pairing:
+            pairstatus = self.CallbackConnector.base.CheckPairStatus()
+            if not pairstatus:
+                self.pairing = False
+
+    def UpdateTimerUI(self, awaitingPairWindow):
+        awaitingPairWindow.setWindowTitle(
+            "Sensor (" + str(self.CallbackConnector.base.pair_number) + ") Awaiting sensor pair request. . . Cancel in: " + str(self.pair_countdown_seconds))
+
+    def ShowPairAnotherSensorDialog(self):
+        messagebox = QMessageBox()
+        messagebox.setText("Pair another sensor?")
+        messagebox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        messagebox.setIcon(QMessageBox.Question)
+        button = messagebox.exec_()
+
+        if button == QMessageBox.Yes:
+            self.Pair_Window()
+        else:
+            self.scan_callback()
+
     def scan_callback(self):
-        sensorList = self.CallbackConnector.Scan_Callback()
+        sensorList = self.CallbackConnector.base.Scan_Callback()
+
         self.SensorListBox.clear()
-        self.SensorListBox.addItems(sensorList)
+
+        number_and_names_str = []
+        for i in range(len(sensorList)):
+            number_and_names_str.append("(" + str(sensorList[i].PairNumber) + ") " + sensorList[i].FriendlyName)
+
+        self.SensorListBox.addItems(number_and_names_str)
         self.SensorListBox.setCurrentRow(0)
 
-        if len(sensorList)>0:
+        if len(sensorList) > 0:
             self.start_button.setEnabled(True)
             self.start_button.setStyleSheet("color : white")
             self.stop_button.setEnabled(True)
@@ -232,20 +311,22 @@ class CollectDataWindow(QWidget):
         self.getpipelinestate()
 
     def start_callback(self):
-        self.CallbackConnector.Start_Callback(self.starttriggercheckbox.isChecked(), self.stoptriggercheckbox.isChecked())
+        self.CallbackConnector.base.Start_Callback(self.starttriggercheckbox.isChecked(),
+                                                   self.stoptriggercheckbox.isChecked())
+        self.CallbackConnector.resetmetrics()
         self.starttriggercheckbox.setEnabled(False)
         self.stoptriggercheckbox.setEnabled(False)
         self.stop_button.setEnabled(True)
         self.getpipelinestate()
 
     def stop_callback(self):
-        self.CallbackConnector.Stop_Callback()
+        self.CallbackConnector.base.Stop_Callback()
         self.getpipelinestate()
 
     def sensorList_callback(self):
         curItem = self.SensorListBox.currentRow()
-        modeList = self.CallbackConnector.getSampleModes(curItem)
-        curMode = self.CallbackConnector.getCurMode(curItem)
+        modeList = self.CallbackConnector.base.getSampleModes(curItem)
+        curMode = self.CallbackConnector.base.getCurMode(curItem)
 
         self.SensorModeList.clear()
         self.SensorModeList.addItems(modeList)
@@ -257,14 +338,7 @@ class CollectDataWindow(QWidget):
         curItem = self.SensorListBox.currentRow()
         selMode = self.SensorModeList.currentText()
         if selMode != '':
-            self.CallbackConnector.setSampleMode(curItem,selMode)
+            self.CallbackConnector.base.setSampleMode(curItem, selMode)
         self.getpipelinestate()
         self.starttriggercheckbox.setEnabled(True)
         self.stoptriggercheckbox.setEnabled(True)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    CollectDataWindow = CollectDataWindow()
-    CollectDataWindow.show()
-    sys.exit(app.exec_())

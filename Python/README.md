@@ -2,15 +2,14 @@
 
 This is an example Python GUI application that uses the DelsysAPI AeroPy Layer to demonstrate functionality that users can implement in their own code. This example allows a user to connect to the base station, pair new sensors, scan for paired sensors, then stream EMG data visualized by plots. 
 
-This version has been tested using [Python 3.8.1](https://www.python.org/downloads/release/python-381/).
+This version has been tested using [Python 3.12.0](https://www.python.org/downloads/release/python-3120/).
 
 See [AeroPy Documentation](#AeroPy-Documentation) 
 
 ## Getting Started
-1. Install Python here: [Python 3.8.1](https://www.python.org/downloads/release/python-381/).
-2. Navigate to the `Example-Applications/Python` base directory
-3. Install dependencies using `python -m pip install -r requirements.txt` 
--NOTE: PythonNet library is only supported up to python 3.8. 
+1. Install Python here: [Python 3.12.0](https://www.python.org/downloads/release/python-3120/).
+2. Navigate to the `/Delsys-Python-Demo` base directory
+3. Install dependencies using `python -m pip install -r requirements.txt`
 4. Open `/AeroPy/TrignoBase.py` and copy/paste the key/license strings provided by Delsys Inc. during system purchase. Contact [support](https://delsys.com/support/) if you have any issues.
 5. If you are using an IDE, set up your python interpreter/virtual environment from the settings.
 6. Make sure the Trigno base station or lite are plugged in, then Run `DelsysPythonDemo.py`
@@ -95,20 +94,53 @@ public Task ScanSensors()
 Scan for previously paired sensors (RF).
 Pipeline must be in the Off or Connected State to run this command 
 
-&nbsp;<br>  
+&nbsp;<br> 
+
 ```C#
-public void PairSensor()
+public SensorTrignoRf[] GetScannedSensorsFound()
+```
+Get an array of sensor objects for all Trigno sensors that were found during a scan. If your sensor is on but not found during a scan please pair the sensor first before scanning again. 
+
+&nbsp;<br> 
+
+
+```C#
+public Task<bool> PairSensor()
 ```
 This sets the base into pairing mode, allowing for a user to pair a new sensor to the base.
 Pipeline must be in the Off or Connected State to run this command 
 
 &nbsp;<br>
+
+```C#
+public Task<bool> PairSensor (int pairnumber)
+```
+This sets the base into pairing mode, allowing for a user to pair a new sensor to the base with a specific pair number.
+Pipeline must be in the Off or Connected State to run this command 
+
+<ins>Basic Pairing in Python</ins>
+
+```python
+pair_number = 1
+pair_confirmation = TrigBase.PairSensor(pair_number)
+```
+
+&nbsp;<br>
+
 ```C#
 public bool CheckPairStatus()
 ```
 After running the PairSensor() command, use this boolean to check if the sensor pair action (i.e. tap to magnet) was completed. Pairing is true while waiting to pair the sensor, and false once the pair has been initiated on a sensor. 
 
-&nbsp;<br>  
+&nbsp;<br>
+
+```C#
+public async void CancelPair()
+```
+Called while a pair is in progress and cancel
+
+&nbsp;<br> 
+
 ```C#
 public bool SelectAllSensors()
 ```
@@ -169,18 +201,32 @@ Default Configure method - Will configure pipeline for raw data output on all sc
 
 &nbsp;<br>  
 
+
+```C#
+public bool IsPipelineConfigured()
+```
+Returns true if the DelsysAPI Pipeline is currently configured for data streaming (ready for Start).
+&nbsp;<br>  
+
 ### Data Collection Management (RF)
 
 ```C#
-public void Start()
+public void Start(bool ytdata = false)
 ```
-Starts Data Stream - Pipeline must be in the Armed state. Pipeline will transition to Running
+Starts Data Stream - Pipeline must be in the Armed state. Pipeline will transition to Running. Pass 'True' to Start command to get YT data output (use CheckYTDataReady() & PollYTData() )
 
 &nbsp;<br>  
 ```C#
 public bool CheckDataQueue()
 ```
-Called while in the Running state (live data collection) Returns true if there is new data in the internal data buffer that is ready to be extracted. If true, use `PollData()` to return the data structure.
+Called while in the Running state (live data collection) Returns true if there is new data in the internal data buffer that is ready to be extracted. If true, use `PollData()` to return the data.
+
+&nbsp;<br>  
+
+```C#
+public bool CheckYTDataQueue()
+```
+Called while in the Running state (live data collection) Returns true if there is new yt data in the internal data buffer that is ready to be extracted. If true, use `PollYTData()` to return the data.
 
 &nbsp;<br>  
 
@@ -190,6 +236,14 @@ public Dictionary<Guid, List<double>> PollData()
 This retrieves the data from the data buffer after the `Start()` method is called. Every time this method is called it will return the data, then clear the internal data queue. The return type is a dictionary output where channel GUID is the key and the channel data is the value
 
 &nbsp;<br>  
+
+```C#
+public Dictionary<Guid, List<(double, double)>> PollYTData()
+```
+This retrieves the data from the data buffer after the `Start(True)` method is called. Every time this method is called it will return the data, then clear the internal data queue. The return type is a dictionary output where channel GUID is the key and the channel data is the value
+
+&nbsp;<br>  
+
 ```C#
 public void Stop()
 ```
@@ -229,5 +283,14 @@ public int GetTotalPackets()
 ```
 Returns the total number of data packets collected from the current streaming session.
 
+```C#
+public string GetAPIUnitsEnumString(int enumInt)
+```
+Returns channel unit string based on unit int value from ChannelTrigno Unit enum
 
+&nbsp;<br>  
+```C#
+public int GetAPIChannelTypeEnumString(int enumInt)
+```
+Returns channel type string based on type int value from ChannelTrigno Type enum
 

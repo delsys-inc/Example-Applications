@@ -1,5 +1,5 @@
-Pyside2
+PySide6
 Vispy
 Scipy
-pythonnet==2.5.2
+pythonnet
 numpy

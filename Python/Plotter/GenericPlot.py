@@ -25,9 +25,9 @@ import random
 
 class GenericPlot(app.Canvas):
     def __init__(self, plot_mode: str = 'windowed'):
-        app.use_app('PySide2')
+        app.use_app('PySide6')
         app.Canvas.__init__(self, title='Use your wheel to zoom!',
-                            keys='interactive', app='PySide2')
+                            keys='interactive', app='PySide6')
         gloo.set_viewport(0, 0, *self.physical_size)
         gloo.set_state(clear_color='black', blend=True,
                        blend_func=('src_alpha', 'one_minus_src_alpha'))
@@ -217,6 +217,7 @@ class GenericPlot(app.Canvas):
 
     def plot_windowed_data(self, data_frame):
         new_data = np.asarray(data_frame, dtype='object')
+
         try: 
             new_data_count = np.size(new_data, 1)
         except:
@@ -239,9 +240,9 @@ class GenericPlot(app.Canvas):
             data_count_in_first_frame = len(plot_data_indexes)
             from_data_index = range(data_count_in_first_frame)
             try:
-                self.y[:, plot_data_indexes] = new_data[:, from_data_index]             
+                self.y[:, plot_data_indexes] = new_data[:, from_data_index]
             except:
-                self.y[:, plot_data_indexes] = new_data[from_data_index]                
+                self.y[:, plot_data_indexes] = new_data[from_data_index]
             self._update_data()
 
             #---- Wrap the graph to the next window
@@ -253,9 +254,9 @@ class GenericPlot(app.Canvas):
             if remaining_data_count > 0:
                 plot_data_indexes = range(0, remaining_data_count)
                 try:
-                    self.y[:, plot_data_indexes] = new_data[:, from_data_index]             
+                    self.y[:, plot_data_indexes] = new_data[:, from_data_index]
                 except:
-                    self.y[:, plot_data_indexes] = new_data[from_data_index]          
+                    self.y[:, plot_data_indexes] = new_data[from_data_index]
                 self.last_plotted_column = plot_data_indexes[-1]
                 self._update_data()
 
