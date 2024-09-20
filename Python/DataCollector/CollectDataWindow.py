@@ -27,23 +27,32 @@ class CollectDataWindow(QWidget):
         self.buttonPanel = self.ButtonPanel()
         self.plotPanel = None
         self.collectionLabelPanel = self.CollectionLabelPanel()
-        self.MetricsConnector = CollectionMetricsManagement()
-        self.splitter = QSplitter(self)
-        self.splitter.addWidget(self.buttonPanel)
 
-        self.splitter.addWidget(self.collectionLabelPanel)
-        self.splitter.addWidget(self.MetricsConnector.collectionmetrics)
-        layout = QHBoxLayout()
+        self.grid = QGridLayout(self)
+
+        self.MetricsConnector = CollectionMetricsManagement()
+        self.collectionLabelPanel.setFixedHeight(275)
+        self.MetricsConnector.collectionmetrics.setFixedHeight(275)
+
+        self.metricspanel = QWidget()
+        self.metricspane = QHBoxLayout()
+        self.metricspane.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.metricspane.addWidget(self.collectionLabelPanel)
+        self.metricspane.addWidget(self.MetricsConnector.collectionmetrics)
+        self.metricspanel.setLayout(self.metricspane)
+        self.metricspanel.setFixedWidth(400)
+        self.grid.addWidget(self.buttonPanel, 0, 0)
+        self.grid.addWidget(self.metricspanel, 0, 1)
+
         self.setStyleSheet("background-color:#3d4c51;")
-        layout.addWidget(self.splitter)
-        self.setLayout(layout)
+        self.setLayout(self.grid)
         self.setWindowTitle("Collect Data GUI")
         self.pairing = False
-        # ---- Connect the controller to the GUI
+        self.selectedSensor = None
 
     def AddPlotPanel(self):
         self.plotPanel = self.Plotter()
-        self.splitter.addWidget(self.plotPanel)
+        self.grid.addWidget(self.plotPanel, 0, 2)
 
     def SetCallbackConnector(self):
         if self.plot_enabled:
@@ -55,10 +64,9 @@ class CollectDataWindow(QWidget):
     # ---- GUI Components
     def ButtonPanel(self):
         buttonPanel = QWidget()
+        buttonPanel.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         buttonLayout = QVBoxLayout()
-
         findSensor_layout = QHBoxLayout()
-
         # ---- Pair Button
         self.pair_button = QPushButton('Pair', self)
         self.pair_button.setToolTip('Pair Sensors')
@@ -67,6 +75,7 @@ class CollectDataWindow(QWidget):
         self.pair_button.clicked.connect(self.pair_callback)
         self.pair_button.setStyleSheet('QPushButton {color: grey;}')
         self.pair_button.setEnabled(False)
+        self.pair_button.setFixedHeight(50)
         findSensor_layout.addWidget(self.pair_button)
 
         # ---- Scan Button
@@ -77,6 +86,7 @@ class CollectDataWindow(QWidget):
         self.scan_button.clicked.connect(self.scan_callback)
         self.scan_button.setStyleSheet('QPushButton {color: grey;}')
         self.scan_button.setEnabled(False)
+        self.scan_button.setFixedHeight(50)
         findSensor_layout.addWidget(self.scan_button)
 
         buttonLayout.addLayout(findSensor_layout)
@@ -106,6 +116,7 @@ class CollectDataWindow(QWidget):
         self.start_button.clicked.connect(self.start_callback)
         self.start_button.setStyleSheet('QPushButton {color: grey;}')
         self.start_button.setEnabled(False)
+        self.start_button.setFixedHeight(50)
         buttonLayout.addWidget(self.start_button)
 
         # ---- Stop Button
@@ -116,14 +127,25 @@ class CollectDataWindow(QWidget):
         self.stop_button.clicked.connect(self.stop_callback)
         self.stop_button.setStyleSheet('QPushButton {color: grey;}')
         self.stop_button.setEnabled(False)
+        self.stop_button.setFixedHeight(50)
         buttonLayout.addWidget(self.stop_button)
+
+        # ---- Export CSV Button
+        self.exportcsv_button = QPushButton('Export CSV', self)
+        self.exportcsv_button.setToolTip('Export collected data to project root - data.csv')
+        self.exportcsv_button.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.exportcsv_button.objectName = 'Export'
+        self.exportcsv_button.clicked.connect(self.exportcsv_callback)
+        self.exportcsv_button.setStyleSheet('QPushButton {color: grey;}')
+        self.exportcsv_button.setEnabled(False)
+        self.exportcsv_button.setFixedHeight(50)
+        buttonLayout.addWidget(self.exportcsv_button)
 
         # ---- Drop-down menu of sensor modes
         self.SensorModeList = QComboBox(self)
         self.SensorModeList.setToolTip('Sensor Modes')
         self.SensorModeList.objectName = 'PlaceHolder'
         self.SensorModeList.setStyleSheet('QComboBox {color: white;background: #848482}')
-        self.SensorModeList.currentIndexChanged.connect(self.sensorModeList_callback)
         buttonLayout.addWidget(self.SensorModeList)
 
         # ---- List of detected sensors
@@ -131,11 +153,11 @@ class CollectDataWindow(QWidget):
         self.SensorListBox.setToolTip('Sensor List')
         self.SensorListBox.objectName = 'PlaceHolder'
         self.SensorListBox.setStyleSheet('QListWidget {color: white;background:#848482}')
-        self.SensorListBox.clicked.connect(self.sensorList_callback)
+        self.SensorListBox.itemClicked.connect(self.sensorList_callback)
+        self.SensorListBox.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         buttonLayout.addWidget(self.SensorListBox)
-
         buttonPanel.setLayout(buttonLayout)
-
+        buttonPanel.setFixedWidth(275)
         return buttonPanel
 
     def Plotter(self):
@@ -146,7 +168,12 @@ class CollectDataWindow(QWidget):
         pc = gp.GenericPlot(plot_mode)
         pc.native.objectName = 'vispyCanvas'
         pc.native.parent = self
+        label = QLabel("*This Demo plots EMG Channels only")
+        label.setStyleSheet('.QLabel { font-size: 8pt;}')
+        label.setFixedHeight(20)
+        label.setAlignment(Qt.AlignmentFlag.AlignRight)
         widget.layout().addWidget(pc.native)
+        widget.layout().addWidget(label)
         self.plotCanvas = pc
 
         return widget
@@ -204,6 +231,8 @@ class CollectDataWindow(QWidget):
         """Pair button callback"""
         self.Pair_Window()
         self.getpipelinestate()
+        self.exportcsv_button.setEnabled(False)
+        self.exportcsv_button.setStyleSheet("color : gray")
 
     def Pair_Window(self):
         """Open pair sensor window to set pair number and begin pairing process"""
@@ -291,14 +320,7 @@ class CollectDataWindow(QWidget):
     def scan_callback(self):
         sensorList = self.CallbackConnector.base.Scan_Callback()
 
-        self.SensorListBox.clear()
-
-        number_and_names_str = []
-        for i in range(len(sensorList)):
-            number_and_names_str.append("(" + str(sensorList[i].PairNumber) + ") " + sensorList[i].FriendlyName)
-
-        self.SensorListBox.addItems(number_and_names_str)
-        self.SensorListBox.setCurrentRow(0)
+        self.set_sensor_list_box(sensorList)
 
         if len(sensorList) > 0:
             self.start_button.setEnabled(True)
@@ -309,6 +331,21 @@ class CollectDataWindow(QWidget):
             self.starttriggercheckbox.setEnabled(True)
             self.stoptriggercheckbox.setEnabled(True)
         self.getpipelinestate()
+        self.exportcsv_button.setEnabled(False)
+        self.exportcsv_button.setStyleSheet("color : gray")
+
+    def set_sensor_list_box(self, sensorList):
+        self.SensorListBox.clear()
+
+        number_and_names_str = []
+        for i in range(len(sensorList)):
+            number_and_names_str.append("(" + str(sensorList[i].PairNumber) + ") " + sensorList[i].FriendlyName)
+            for j in range(len(sensorList[i].TrignoChannels)):
+                if sensorList[i].TrignoChannels[j].IsEnabled and not str(sensorList[i].TrignoChannels[j].Type) == "SkinCheck":
+                    number_and_names_str[i] += "\n     -" + sensorList[i].TrignoChannels[j].Name + " (" + str(
+                        round(sensorList[i].TrignoChannels[j].SampleRate, 3)) + " Hz)"
+
+        self.SensorListBox.addItems(number_and_names_str)
 
     def start_callback(self):
         self.CallbackConnector.base.Start_Callback(self.starttriggercheckbox.isChecked(),
@@ -317,28 +354,57 @@ class CollectDataWindow(QWidget):
         self.starttriggercheckbox.setEnabled(False)
         self.stoptriggercheckbox.setEnabled(False)
         self.stop_button.setEnabled(True)
+        self.exportcsv_button.setEnabled(False)
+        self.exportcsv_button.setStyleSheet("color : gray")
         self.getpipelinestate()
 
     def stop_callback(self):
         self.CallbackConnector.base.Stop_Callback()
         self.getpipelinestate()
+        self.exportcsv_button.setEnabled(True)
+        self.exportcsv_button.setStyleSheet("color : white")
+
+    def exportcsv_callback(self):
+        export = None
+        if self.CallbackConnector.streamYTData:
+            export = self.CallbackConnector.base.csv_writer.exportYTCSV()
+        else:
+            export = self.CallbackConnector.base.csv_writer.exportCSV()
+        self.getpipelinestate()
+        print("CSV Export: " + str(export))
 
     def sensorList_callback(self):
-        curItem = self.SensorListBox.currentRow()
-        modeList = self.CallbackConnector.base.getSampleModes(curItem)
-        curMode = self.CallbackConnector.base.getCurMode(curItem)
+        current_selected = self.SensorListBox.currentRow()
+        if self.selectedSensor is None or self.selectedSensor != current_selected:
+            if self.selectedSensor is not None:
+                self.SensorModeList.currentIndexChanged.disconnect(self.sensorModeList_callback)
+            self.selectedSensor = self.SensorListBox.currentRow()
+            modeList = self.CallbackConnector.base.getSampleModes(self.selectedSensor)
+            curMode = self.CallbackConnector.base.getCurMode(self.selectedSensor)
 
+            if curMode is not None:
+                self.resetModeList(modeList)
+                self.SensorModeList.setCurrentText(curMode)
+                self.starttriggercheckbox.setEnabled(True)
+                self.stoptriggercheckbox.setEnabled(True)
+                self.SensorModeList.currentIndexChanged.connect(self.sensorModeList_callback)
+
+    def resetModeList(self, mode_list):
         self.SensorModeList.clear()
-        self.SensorModeList.addItems(modeList)
-        self.SensorModeList.setCurrentText(curMode)
-        self.starttriggercheckbox.setEnabled(True)
-        self.stoptriggercheckbox.setEnabled(True)
+        self.SensorModeList.addItems(mode_list)
 
     def sensorModeList_callback(self):
         curItem = self.SensorListBox.currentRow()
+        curMode = self.CallbackConnector.base.getCurMode(curItem)
         selMode = self.SensorModeList.currentText()
-        if selMode != '':
-            self.CallbackConnector.base.setSampleMode(curItem, selMode)
-        self.getpipelinestate()
-        self.starttriggercheckbox.setEnabled(True)
-        self.stoptriggercheckbox.setEnabled(True)
+        if curMode != selMode:
+            if selMode != '':
+                self.CallbackConnector.base.setSampleMode(curItem, selMode)
+                self.getpipelinestate()
+                self.starttriggercheckbox.setEnabled(True)
+                self.stoptriggercheckbox.setEnabled(True)
+
+                sensorList = self.CallbackConnector.base.TrigBase.GetScannedSensorsFound()
+                self.set_sensor_list_box(sensorList)
+                self.SensorModeList.setCurrentText(selMode)
+                self.SensorListBox.setCurrentRow(curItem)

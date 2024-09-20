@@ -9,8 +9,8 @@ class LandingScreenController():
 
         self.startWindow.show()
 
-        self.curHeight = 650
-        self.curWidth = 1115
+        self.curHeight = 900
+        self.curWidth = 1400
 
     def showStartMenu(self):
         self.collectWindow.close()

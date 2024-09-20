@@ -15,8 +15,7 @@ See [AeroPy Documentation](#AeroPy-Documentation)
 6. Make sure the Trigno base station or lite are plugged in, then Run `DelsysPythonDemo.py`
 
 
-## Usage Instructions
-Click on the `Collect Data` button on the Start Menu to bring up the Data Collection window. 
+## Example App Instructions
 
 Ensure that your Trigno system is connected to power and the PC via USB. Click the `Connect` button to connect the app to the station.  In your terminal you will see some log and initialization messages.
 
@@ -26,13 +25,20 @@ Click the `Scan` button. This will add your sensor to the application's sensor l
 
 To begin the data stream and plotting, click the `Start` button. To stop the data stream and plotting, click the `Stop` button.
 
-Click the `Reset Pipeline` button to return to the Connected pipeline state. NOTE: You must click reset pipeline after a data stream if you want to scan/pair/change modes. If you are using the same sensor configuration for another data stream, Start/Stop can be pressed continuously without a reset.
 
 ## Further Reference
 See the DelsysAPI Documentation [here](http://data.delsys.com/DelsysServicePortal/api/web-api/index.html).
 
+## Navigation
+[Python Setup](#Setup-(python)) &nbsp;<br>
+[Connecting to the Trigno Base/Lite](#Connecting-to-the-Trigno-USB) &nbsp;<br>
+[Sensor Management](#Sensor-Management) &nbsp;<br>
+[Pre Data Collection Configuration](#Pre-Data-Collection-Configuration) &nbsp;<br>
+[Data Collection Management](#Data-Collection-Management) &nbsp;<br>
+[Helper Functions](#Helper-Functions) &nbsp;<br>
+[DelsysAPI Object Properties](#DelsysAPI-Object-Properties) &nbsp;<br>
 
-&nbsp;<br>
+
 
 # AeroPy Documentation
 
@@ -79,7 +85,7 @@ Call TrignoBase class from your program script.
 ```
 Use TrigBase variable to call AeroPy functions. See all AeroPy methods below:
 
-### Connecting to the Trigno Base/Lite
+### Connecting to the Trigno USB
 ```C#
 public void ValidateBase(string key, string license)
 ```
@@ -108,7 +114,8 @@ Get an array of sensor objects for all Trigno sensors that were found during a s
 public Task<bool> PairSensor()
 ```
 This sets the base into pairing mode, allowing for a user to pair a new sensor to the base.
-Pipeline must be in the Off or Connected State to run this command 
+Pipeline must be in the Off or Connected State to run this command. Sensors only need to be paired to a specific base/lite one time.
+Once a sensor has been paired, you will only need to turn on the sensor and begin a scan to connect it.
 
 &nbsp;<br>
 
@@ -116,10 +123,11 @@ Pipeline must be in the Off or Connected State to run this command
 public Task<bool> PairSensor (int pairnumber)
 ```
 This sets the base into pairing mode, allowing for a user to pair a new sensor to the base with a specific pair number.
-Pipeline must be in the Off or Connected State to run this command 
+Pipeline must be in the Off or Connected State to run this command. Sensors only need to be paired to a specific base/lite one time.
+Once a sensor has been paired, you will only need to turn on the sensor and begin a scan to connect it. To update the pair number you must re-pair that sensor with the new pair number.
 
-<ins>Basic Pairing in Python</ins>
-
+<ins>Basic Pairing in Python</ins> 
+(Without dialog window prompt or threading operation to await pair request)
 ```python
 pair_number = 1
 pair_confirmation = TrigBase.PairSensor(pair_number)
@@ -192,12 +200,12 @@ Return the list of sensor modes available to the sensor at index sensorSelected
 
 &nbsp;<br>  
 
-### Sensor Configuration (RF)
+### Pre Data Collection Configuration
 
 ```C#
 public void Configure(bool starttrigger = false, bool stoptrigger = false)
 ```
-Default Configure method - Will configure pipeline for raw data output on all scanned sensors. To enable triggering (start/stop) pass two 'True' booleans to this method. If no arguments are provided, the system will be set up without start/stop triggering enabled. Pipeline will transition to Armed
+Configure pipeline for raw data output on all connected sensors. To enable triggering (start/stop) pass two 'True' booleans to this method. If no arguments are provided, the system will be set up without start/stop triggering enabled. Pipeline will transition to Armed
 
 &nbsp;<br>  
 
@@ -208,7 +216,19 @@ public bool IsPipelineConfigured()
 Returns true if the DelsysAPI Pipeline is currently configured for data streaming (ready for Start).
 &nbsp;<br>  
 
-### Data Collection Management (RF)
+### Data Collection Management
+By default, this application will stream data from all channels based on what sensor(s) is/are connected (previously paired & scanned in) along with the mode the sensor(s) is/are operating in (See SetSampleMode above). 
+Certain sensor modes will have more or less channels than others. See console output after pressing Start to see full list of sensors and their channels.
+
+**Channel GUIDs**
+
+Each Trigno channel will have a unique GUID associated with it. These GUIDs are primarily used when parsing the real-time data packets from the DelsysAPI.
+See PollData() definitions below for details. 
+
+Channel GUIDs can be obtained after Configure() and prior to data streaming (Start) so that users have the ability to choose which channels to take during data streaming.
+See ConfigureCollectionOutput() method in TrignoBase.py for implementation example.
+
+&nbsp;<br>  
 
 ```C#
 public void Start(bool ytdata = false)
@@ -270,7 +290,7 @@ public bool IsWaitingForStopTrigger()
 If stop trigger is enabled, once the data collection has started this method will return true until the stop trigger is pressed, then this method will return false and the data streaming will end.
 
 &nbsp;<br> 
-### Helper Functions (RF Connection)
+### Helper Functions
 
 ```C#
 public string GetPipelineState()
@@ -294,3 +314,91 @@ public int GetAPIChannelTypeEnumString(int enumInt)
 ```
 Returns channel type string based on type int value from ChannelTrigno Type enum
 
+
+&nbsp;<br>
+
+## DelsysAPI Object Properties
+
+### SensorTrignoRF (READ-ONLY)
+via GetSensorObject(int sensorNo)
+&nbsp;<br>
+&nbsp;<br>
+```C#
+public List<ChannelTrigno> TrignoChannels
+```
+List if all ChannelTrigno objects associated with the sensor (Channels and properties dependent on the mode the sensor is set to). All EMG modes will have the EMG channel at index 0.
+&nbsp;<br>
+&nbsp;<br>
+```C#
+public int PairNumber
+```
+Number provided by the user on pair.
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public string Configuration.ModeString
+```
+String description of current operating mode
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public string[] Configuration.SampleModes
+```
+List of all available sample modes for the sensor (different sensor types will have different available modes)
+&nbsp;<br>
+&nbsp;<br>
+```C#
+public int Properties.Sid
+```
+Unique SID of the physical sensor. This ID never changes for this sensor.
+&nbsp;<br>
+&nbsp;<br>
+
+### ChannelTrigno (READ-ONLY)
+Channel object via SensorTrignoRF's TrignoChannels list
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public Guid Id
+```
+Channel ID used when parsing real-time data packets from DelsysAPI
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public string Name
+```
+The channel name, typically the type and index. Ex: EMG 1, ACC X etc.
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public double SampleRate
+```
+Sampling frequency of the channel
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public Units Unit
+```
+Channel Unit enum. Use str() in python to get the string representation for this enum. Ex: Millivolts, G, Deg_S etc.
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public ChannelTypes Type
+```
+Channel Type enum. Use str() in python to get the string representation for this enum. Ex: EMG, ACC, GYRO etc.
+&nbsp;<br>
+&nbsp;<br>
+
+```C#
+public bool IsEnabled
+```
+Certain Trigno channels exist during data streaming that have no use for the user. Channels that are used will have IsEnabled set to True
+&nbsp;<br>
+&nbsp;<br>

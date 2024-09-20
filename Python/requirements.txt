@@ -1,5 +1,5 @@
 PySide6
 Vispy
 Scipy
-pythonnet
+pythonnet==3.0.3
 numpy

@@ -22,7 +22,7 @@ class PlottingManagement():
         self.metrics = metrics
         self.packetCount = 0  # Number of packets received from base
         self.pauseFlag = True  # Flag to start/stop collection and plotting
-        self.DataHandler = DataKernel(self.base.TrigBase)  # Data handler for receiving data from base
+        self.DataHandler = DataKernel(self.base)  # Data handler for receiving data from base
         self.base.DataHandler = self.DataHandler
         self.outData = [[0]]
         self.Index = None
@@ -57,7 +57,7 @@ class PlottingManagement():
                     self.outData = list(np.asarray(incData, dtype='object')[tuple([self.base.emgChannelsIdx])])
                 except IndexError:
                     print("Index Error Occurred: vispyPlot()")
-                if self.base.emgChannelsIdx and self.outData[0].size > 0:
+                if self.base.emgChannelsIdx and len(self.outData[0]) > 0:
                     try:
                         self.EMGplot.plot_new_data(self.outData,
                                                    [self.emg_plot[0][i][0] for i in self.base.emgChannelsIdx])
