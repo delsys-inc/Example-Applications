@@ -112,6 +112,8 @@ class PlottingManagement():
         while self.base.TrigBase.IsWaitingForStopTrigger():
             continue
         self.pauseFlag = True
-        self.metrics.pipelinestatelabel.setText(self.PipelineState_Callback())
+        self.metrics.pipelinestatelabel.setText(self.base.PipelineState_Callback())
+        self.collect_data_window.exportcsv_button.setEnabled(True)
+        self.collect_data_window.exportcsv_button.setStyleSheet("color : white")
         print("Trigger Stop - Data Collection Complete")
         self.DataHandler.processData(self.emg_plot)

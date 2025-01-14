@@ -263,7 +263,7 @@ class GenericPlot(app.Canvas):
     #-----------------------------------------------------------------------
     #---- Helper Functions
     def _reset_data_plot_buffer(self):
-        self.y = np.NaN * np.zeros((self.m, self.n)).astype(np.float32)
+        self.y = np.nan * np.zeros((self.m, self.n)).astype(np.float32)
         self.last_plotted_column = -1
 
     def _update_data(self):
