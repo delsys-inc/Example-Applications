@@ -83,7 +83,7 @@ classdef Component < handle
         %Return an array of all channel data from this sensor component%
                     
             channelCount = obj.ChannelCount();
-            data = cell(channelCount);
+            data = cell(channelCount,1);
             for i = 1:channelCount
                 channel = obj.Channel(i);
                 data{i} = channel.Data();
@@ -94,7 +94,7 @@ classdef Component < handle
         %Return an array of all channel names for this sensor component%
         
             channelCount = obj.ChannelCount();
-            names = cell(channelCount);
+            names = cell(channelCount,1);
             for i = 1:channelCount
                 channel = obj.Channel(i);
                 names{i} = channel.Name();
@@ -105,7 +105,7 @@ classdef Component < handle
         %Return an array of all channel sample rates for this sensor component%
         
             channelCount = obj.ChannelCount();
-            sampleRates = cell(channelCount);
+            sampleRates = cell(channelCount,1);
             for i = 1:channelCount
                 channel = obj.Channel(i);
                 sampleRates{i} = channel.SampleRate();
@@ -116,7 +116,7 @@ classdef Component < handle
         %Return an array of all channel units for this sensor component%
         
             channelCount = obj.ChannelCount();
-            units = cell(channelCount);
+            units = cell(channelCount,1);
             for i = 1:channelCount
                 channel = obj.Channel(i);
                 units{i} = channel.Units();
