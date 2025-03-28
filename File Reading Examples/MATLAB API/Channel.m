@@ -3,13 +3,15 @@ classdef Channel < handle
     
     properties (Access = private)
        channel;
+       datastream;
     end
     
     methods  
-        function obj = Channel(channel)
+        function obj = Channel(channel, datastream)
         %Returns channel object%
         
            obj.channel = channel;
+           obj.datastream = datastream;
         end
         
         function name = Name(obj)
@@ -74,23 +76,15 @@ classdef Channel < handle
             localChannelNumber = double(obj.channel.LocalChannelNumber);
         end
         
+        function guid = Guid(obj)
+            
+            guid = string(obj.channel.GuidString);
+            
+        end
+        
         function parsedData = Data(obj)
         %Channel Data - All of the data associated with this channel during the collection%
-        
-            data = obj.channel.Data;
-            frameCount = data.Count();
-            firstFrameData = data.Item(0).Item2;
-            dataCountEachFrame = firstFrameData.Count();
-            
-            parsedData = zeros(1,frameCount*dataCountEachFrame);
-            for frame = 1:frameCount
-                frameDataTuple = data.Item(frame-1);
-                frameData = frameDataTuple.Item2();
-                for dataPoint = 1:dataCountEachFrame
-                    frameIndexOffset = (frame-1)*dataCountEachFrame;
-                    parsedData(frameIndexOffset + dataPoint) = frameData.Item(dataPoint-1);
-                end
-            end
+            parsedData = double(obj.channel.GetYData(obj.datastream));
         end
     end
 end

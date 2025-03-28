@@ -1,11 +1,13 @@
 from enum import Enum
+from uuid import UUID
 import numpy as np
 
 class Channel:
     """Channel class wrapper for FileReaderAPI"""
 
-    def __init__(self, channel):
+    def __init__(self, channel, data):
         self.channel = channel
+        self.data = data
 
     def Name(self) -> str:
         """Channel Name - This name can be set prior to a data stream"""
@@ -22,7 +24,7 @@ class Channel:
     def Units(self) -> str:
         """Channel Unit - The unit of measurement for this channel"""
 
-        units = str(Units(self.channel.Units).name)
+        units = str(Units(int(self.channel.Units)).name)
         return units
 
     def RangeMin(self) -> float:
@@ -62,22 +64,18 @@ class Channel:
         return channelWidth
 
 
-    def LocalChannelNumber(self) -> bytes:
+    def LocalChannelNumber(self):
         """Channel Local Index - Channel index based on all the sensor component channels"""
 
         localChannelNumber = int(self.channel.LocalChannelNumber)
         return localChannelNumber
 
+    def Guid(self) -> str:
+        return self.channel.GuidString;
+
     def Data(self):
         """Channel Data - All of the data associated with this channel during the collection"""
-        
-        data = self.channel.Data
-        dataCount = len(data)
-        parsedData = []
-        for i in range(dataCount):
-            for k in data[i].Item2:
-                parsedData.append(k)
-        return parsedData
+        return list(self.channel.GetYData(self.data))
 
 class Units(Enum):
         Unknown = 0
@@ -110,3 +108,5 @@ class Units(Enum):
         L = 27
         L_min = 28
         mL_kg_min = 29
+        BrPM = 30,
+        mL_min = 31

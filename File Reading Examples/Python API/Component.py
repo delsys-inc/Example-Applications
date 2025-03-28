@@ -3,8 +3,9 @@ from Channel import Channel
 class Component:
     """Component class wrapper for FileReaderAPI"""
 
-    def __init__(self, component):
+    def __init__(self, component, data):
         self.component = component
+        self.data = data
 
     def SensorId(self) -> int:
         """Component/Sensor ID - Unique ID of the sensor component"""
@@ -63,7 +64,7 @@ class Component:
         """Component/Sensor Channel Object - Pass channel index to return the channel object"""
 
         tempChannel = self.component.Channels[selectedChannel]
-        channel = Channel(tempChannel)
+        channel = Channel(tempChannel, self.data)
         return channel
 
     def ChannelCount(self) -> int:
