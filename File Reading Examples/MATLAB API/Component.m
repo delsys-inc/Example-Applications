@@ -3,20 +3,22 @@ classdef Component < handle
     
     properties (Access = private)
        component;
+       data;
     end
     
     methods  
-        function obj = Component(component)
+        function obj = Component(component, data)
         %Returns component object%
         
            obj.component = component;
+           obj.data = data;
         end
         
         function channel = Channel(obj, selectedChannel)
         %Returns channel object at selectedChannels index%
         
             tempChannel = obj.component.Channels.Item(ShiftIndexing(obj, selectedChannel));
-            channel = Channel(tempChannel);
+            channel = Channel(tempChannel, obj.data);
         end
         
         function sensorId = SensorId(obj)

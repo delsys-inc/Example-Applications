@@ -37,6 +37,7 @@ See the DelsysAPI Documentation [here](http://data.delsys.com/DelsysServicePorta
 [Data Collection Management](#Data-Collection-Management) &nbsp;<br>
 [Helper Functions](#Helper-Functions) &nbsp;<br>
 [DelsysAPI Object Properties](#DelsysAPI-Object-Properties) &nbsp;<br>
+[Centro Triggering](#Centro-Trigger-Configuration) &nbsp;<br>
 
 
 
@@ -402,3 +403,11 @@ public bool IsEnabled
 Certain Trigno channels exist during data streaming that have no use for the user. Channels that are used will have IsEnabled set to True
 &nbsp;<br>
 &nbsp;<br>
+
+# Centro Trigger Configuration
+
+Trigno Centro has BNC inputs on the back to enable synchronization and integrations with other software. See image below for the default trigger configuration for Aero. 
+
+![img.png](Images/centro_trigger_config.png)
+&nbsp;<br>
+*When triggering is enabled, both input channels listen for rising signal at 3.3V. Sync output has a frequency of 74Hz at 3.3V.

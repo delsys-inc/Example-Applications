@@ -13,14 +13,14 @@ classdef DelsysFile < handle
         function component = Component(obj, selectedComponent)
         %Component/Sensor Object - Pass component index and return the component object%
         
-            tempComponent = obj.file.Components.Item(ShiftIndexing(obj, selectedComponent));
-            component = Component(tempComponent);
+            tempComponent = obj.file.Trial.Components.Item(ShiftIndexing(obj, selectedComponent));
+            component = Component(tempComponent, obj.file.Trial.DataStream);
         end
         
         function componentCount = ComponentCount(obj)
         %Returns the amount of sensor components in the file%
         
-            componentCount = double(obj.file.Components.Count);
+            componentCount = double(obj.file.Trial.Components.Count);
         end
         
         function data = GetAllData(obj)
@@ -35,6 +35,22 @@ classdef DelsysFile < handle
                     data{i} = componentData{j};
                 end
             end
+        end
+        
+        function trialname = Name(obj)
+        %Return trial name%
+
+            trialname = string(obj.file.Trial.Name());
+        end
+
+        function timeseries = GetChannelTimeSeries(obj, guid)
+        %Get time series for a given channel%
+            timeseries = double(obj.file.Trial.GetChannelXyData(guid).xData);
+        end
+
+        function xychanneldata = GetChannelXyData(obj, guid)
+        %Get xy data for a given channel%    
+            xychanneldata = obj.file.Trial.GetChannelXyData(guid);
         end
     
     end
