@@ -27,13 +27,10 @@ classdef DelsysFile < handle
         %Return all of the data from all sensor/component channels%
         
             componentCount = obj.ComponentCount();
-            data = {};
+            data = cell(componentCount,1);
             for i = 1:componentCount
-                component = Component(i);
-                componentData = component.GetAllData();
-                for j = 1:length(componentData)
-                    data{i} = componentData{j};
-                end
+                component = obj.Component(i);
+                data{i} = component.GetAllData();
             end
         end
         
